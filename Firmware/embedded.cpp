@@ -22,6 +22,10 @@ uint8_t alarm_2_hour = 0;
 uint8_t alarm_2_min = 0;
 uint8_t alarm_3_hour = 0;
 uint8_t alarm_3_min = 0;
+uint8_t minTemp;
+uint8_t maxTemp;
+uint8_t minHum;
+uint8_t maxHum;
 
 float LDR_Val = 0;
 int LDR_PIN =34;
@@ -185,6 +189,10 @@ void connectToBroker(){
 			mqttClient.subscribe("buzzerDelay");
 			mqttClient.subscribe("buzzerfreq");
 			mqttClient.subscribe("buzzerType");
+			mqttClient.subscribe("minTemp");
+			mqttClient.subscribe("maxTemp");
+			mqttClient.subscribe("minHum");
+			mqttClient.subscribe("maxHum");
 			
 		}
 		else {
@@ -341,7 +349,30 @@ void callback(char* topic, byte* payload, unsigned int length) {
 		
 	}
 
+	if (strcmp(topic, "minTemp") == 0){
 
+		minTemp = atof(&incdata[0]);
+
+		
+	}
+	if (strcmp(topic, "maxTemp") == 0){
+
+		maxTemp = atof(&incdata[0]);
+
+		
+	}
+	if (strcmp(topic, "minHum") == 0){
+
+		minHum = atof(&incdata[0]);
+
+		
+	}
+	if (strcmp(topic, "maxHum") == 0){
+
+		maxHum = atof(&incdata[0]);
+
+		
+	}
 	
 
 }
@@ -349,7 +380,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 void displayAlertHumAndTemp(){
 	int humidity = (humAr[0]-'0')*10+humAr[1]-'0';
 	int temperature = (tempAr[0]-'0')*10+tempAr[1]-'0';
-	if ( humidity>85 |humidity<35 | temperature>35 | temperature<5){
+	if ( humidity>maxHum |humidity<minHum | temperature>maxTemp | temperature<minTemp){
 		mqttClient.publish("alert", "RISKY TH");
 	}
 }
