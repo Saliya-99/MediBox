@@ -40,7 +40,7 @@ uint8_t buzzerMode = 0;
 uint8_t day;
 uint8_t hour;
 uint8_t minute;
-char tempAr[6];
+char tempAr[9];
 char humAr[6];
 DHTesp dhtSensor;
 const int DHT_PIN = 15;
@@ -73,7 +73,7 @@ void loop() {
 	buzzerAlarms();
 	displayAlertHumAndTemp();
 	updateTempAndHum();
-	mqttClient.publish("Temp", tempAr);
+	mqttClient.publish("Tempt", tempAr);
 	mqttClient.publish("Hum", humAr);
 	Serial.print("Alarm_1: ");
 	Serial.print((alarm_1_hour));
@@ -208,9 +208,9 @@ void connectToBroker(){
 }
 void updateTempAndHum(){
 	TempAndHumidity  data = dhtSensor.getTempAndHumidity();
-	String(data.temperature, 2).toCharArray(tempAr,6);
+	String(data.temperature, 1).toCharArray(tempAr,9);
 	String(data.humidity, 1).toCharArray(humAr,6);
-	Serial.println("Temp: " + String(data.temperature, 2) + "°C");
+	Serial.println("Temp: " + String(data.temperature, 1) + "°C");
 	Serial.println("Humidity: " + String(data.humidity, 1) + "%");
 	Serial.println("---");
 }
