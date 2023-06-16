@@ -3,6 +3,11 @@
 #include "DHTesp.h"
 #include "RTClib.h"
 #include <ESP32Servo.h>
+#include <LiquidCrystal_I2C.h>
+
+#define I2C_ADDR    0x27
+#define LCD_COLUMNS 20
+#define LCD_LINES   4
 
 const int servoPin = 18;
 
@@ -10,6 +15,7 @@ Servo servo;
 RTC_DS1307 rtc;
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
+LiquidCrystal_I2C lcd(I2C_ADDR, LCD_COLUMNS, LCD_LINES);
 
 uint8_t numofDays = 0;
 uint8_t  playAlarm_1  = 0;
@@ -57,6 +63,8 @@ void setup() {
   setupWifi();
   setupMqtt();
   dhtSensor.setup(DHT_PIN, DHTesp::DHT22);
+  lcd.init();
+  lcd.backlight();
 }
 
 void loop() {
@@ -75,6 +83,7 @@ void loop() {
   updateTempAndHum();
   mqttClient.publish("Tempt", tempAr);
   mqttClient.publish("Hum", humAr);
+  lcd_display();
   Serial.print("Alarm_1: ");
   Serial.print((alarm_1_hour));
   Serial.print(":");
@@ -90,6 +99,37 @@ void loop() {
 
   delay(1000);
   
+}
+
+void lcd_display(){
+
+  lcd.setCursor(0, 0);
+  lcd.print(alarm_1_hour);
+  
+  lcd.setCursor(2, 0);
+  lcd.print(":");
+  lcd.setCursor(3, 0);
+  lcd.print(alarm_1_min);
+
+  lcd.setCursor(0, 1);
+  lcd.print(alarm_2_hour);
+  
+  lcd.setCursor(2, 1);
+  lcd.print(":");
+  lcd.setCursor(3, 1);
+  lcd.print(alarm_2_min);
+
+  lcd.setCursor(0, 2);
+  lcd.print(alarm_3_hour);
+  
+  lcd.setCursor(2, 2);
+  lcd.print(":");
+  lcd.setCursor(3, 2);
+  lcd.print(alarm_3_min);
+
+  lcd.setCursor(0, 3);
+  lcd.print(numofDays);
+
 }
 
 void readTime(){
@@ -311,7 +351,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   if (strcmp(topic, "NumOfDaysToRepeat") == 0){
 
-    numofDays = incdata[0] - '0';
+    numofDays = atof(&incdata[0]);
     
   }
 
