@@ -16,7 +16,9 @@ RTC_DS1307 rtc;
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 LiquidCrystal_I2C lcd(I2C_ADDR, LCD_COLUMNS, LCD_LINES);
-
+DHTesp dhtSensor;
+//variables
+//schedulaer
 uint8_t numofDays = 0;
 uint8_t  playAlarm_1  = 0;
 uint8_t  playAlarm_2  = 0;
@@ -28,28 +30,35 @@ uint8_t alarm_2_hour = 0;
 uint8_t alarm_2_min = 0;
 uint8_t alarm_3_hour = 0;
 uint8_t alarm_3_min = 0;
+//min and max value of temperature and humidity
 uint8_t minTemp;
 uint8_t maxTemp;
 uint8_t minHum;
 uint8_t maxHum;
-
+//Light intensity
 float LDR_Val = 0;    
 int LDR_PIN =34; 
+//shade controller
 uint8_t servoAngle;
 uint8_t angleOffset = 30;
 float CF = 0.75;
 int pos;
+//buzzer settings 
 int buzzerDelay= 100;
 int buzzerFrequency= 250;
 uint8_t buzzerMode = 0;
-
+//RTC module
 uint8_t day;
 uint8_t hour;
 uint8_t minute;
 char tempAr[9];
 char humAr[6];
-DHTesp dhtSensor;
+//dht22 sensor
 const int DHT_PIN = 15;
+//LCD display controll
+
+uint8_t gotoAlarm = 0;
+uint8_t gotomainMenu=0;
 
 void setup() {
   Serial.begin(115200);
@@ -103,32 +112,73 @@ void loop() {
 
 void lcd_display(){
 
-  lcd.setCursor(0, 0);
-  lcd.print(alarm_1_hour);
-  
-  lcd.setCursor(2, 0);
-  lcd.print(":");
-  lcd.setCursor(3, 0);
-  lcd.print(alarm_1_min);
 
-  lcd.setCursor(0, 1);
-  lcd.print(alarm_2_hour);
-  
-  lcd.setCursor(2, 1);
-  lcd.print(":");
-  lcd.setCursor(3, 1);
-  lcd.print(alarm_2_min);
 
-  lcd.setCursor(0, 2);
-  lcd.print(alarm_3_hour);
-  
-  lcd.setCursor(2, 2);
-  lcd.print(":");
-  lcd.setCursor(3, 2);
-  lcd.print(alarm_3_min);
+  if (digitalRead(12)==0){
+    gotoAlarm = 1;
+  }
+  if (digitalRead(14)==0){
+      gotomainMenu = 1;
+      gotoAlarm =0;
+  }
+  // Serial.println(digitalRead(12));
 
-  lcd.setCursor(0, 3);
-  lcd.print(numofDays);
+  if (gotoAlarm==1){
+
+    lcd.clear();
+
+    lcd.setCursor(0, 0);
+    lcd.print("Alarm 1: ");
+
+    lcd.setCursor(10, 0);
+    lcd.print(alarm_1_hour);
+
+    lcd.setCursor(12, 0);
+    lcd.print(":");
+    lcd.setCursor(13, 0);
+    lcd.print(alarm_1_min);
+
+    
+    lcd.setCursor(0, 1);
+    lcd.print("Alarm 2: ");
+
+    lcd.setCursor(10, 1);
+    lcd.print(alarm_2_hour);
+
+    lcd.setCursor(12, 1);
+    lcd.print(":");
+    lcd.setCursor(13, 1);
+    lcd.print(alarm_2_min);
+
+    
+    lcd.setCursor(0, 2);
+    lcd.print("Alarm 3: ");
+
+    lcd.setCursor(10, 2);
+    lcd.print(alarm_3_hour);
+
+    lcd.setCursor(12, 2);
+    lcd.print(":");
+    lcd.setCursor(13, 2);
+    lcd.print(alarm_3_min);
+    
+  }
+  
+  else{
+
+    lcd.clear();
+    lcd.setCursor(7, 0);
+    lcd.print("WELCOME");
+    lcd.setCursor(7, 1);
+    lcd.print(hour);
+    lcd.setCursor(9, 1);
+    lcd.print(":");
+    lcd.setCursor(10, 1);
+    lcd.print(minute);
+
+  }
+
+
 
 }
 
@@ -144,7 +194,7 @@ void readTime(){
 }
 
 void buzzerAlarms(){
-    if (scheduler == 1){
+    if ((scheduler == 1) && (numofDays>0)){
       Serial.println("In scheduler");
       if (playAlarm_1==1){
         Serial.println("in al 1");
