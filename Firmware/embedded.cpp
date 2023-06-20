@@ -475,7 +475,7 @@ void displayAlertHumAndTemp(){
   }
 }
 void readLDR(){
-  LDR_Val = (float)analogRead(LDR_PIN)/4063;
+  LDR_Val = 1-(float)analogRead(LDR_PIN)/4063;
   char ldr[6];
   dtostrf(LDR_Val, 4, 3, ldr);
    mqttClient.publish("UVINDEX", ldr);
