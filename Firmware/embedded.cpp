@@ -19,6 +19,7 @@ LiquidCrystal_I2C lcd(I2C_ADDR, LCD_COLUMNS, LCD_LINES);
 DHTesp dhtSensor;
 //variables
 //schedulaer
+
 uint8_t numofDays = 0;
 uint8_t  playAlarm_1  = 0;
 uint8_t  playAlarm_2  = 0;
@@ -60,6 +61,15 @@ const int DHT_PIN = 15;
 uint8_t gotoAlarm = 0;
 uint8_t gotomainMenu=0;
 
+
+
+ 
+// void IRAM_ATTR toggleAlarm()
+// {
+//   stopAlarm = 1;
+//   Serial.println("Interrupt Called");
+// }
+
 void setup() {
   Serial.begin(115200);
   pinMode(13,OUTPUT);
@@ -74,6 +84,10 @@ void setup() {
   dhtSensor.setup(DHT_PIN, DHTesp::DHT22);
   lcd.init();
   lcd.backlight();
+
+  // pinMode(25, OUTPUT);
+  // digitalWrite(25,LOW);
+  // attachInterrupt(25, toggleAlarm, FALLING);
 }
 
 void loop() {
@@ -83,6 +97,7 @@ void loop() {
   mqttClient.loop();
   if (hour ==0 && minute == 0){
     numofDays -= 1;
+
   }
   servoTurn();
   readTime();
@@ -106,7 +121,7 @@ void loop() {
   Serial.print(":");
   Serial.println(alarm_3_min);
 
-  delay(1000);
+  delay(100);
   
 }
 
@@ -194,6 +209,8 @@ void readTime(){
 }
 
 void buzzerAlarms(){
+
+
     if ((scheduler == 1) && (numofDays>0)){
       Serial.println("In scheduler");
       if (playAlarm_1==1){
@@ -233,19 +250,26 @@ void setupWifi(){
 }
 
 void PlayBuzzer(){
+
   Serial.println("alarm:");
   if (buzzerMode ==0){  
-    digitalWrite(13, HIGH);
-    delay(100);
+    // digitalWrite(13, HIGH);
+    // delay(100);
+
     tone(13, buzzerFrequency, buzzerDelay);
-    digitalWrite(13, LOW);
     delay(100);
+
+    
+    // digitalWrite(13, LOW);
+    // delay(100);
      
       
   }
   else{
+   
     tone(13, buzzerFrequency, buzzerDelay);
   }
+
 
  
 }
@@ -320,10 +344,10 @@ void callback(char* topic, byte* payload, unsigned int length) {
   if (strcmp(topic, "AlarmOnOff") == 0){
      if (incdata[0] == '1'){
       scheduler = 1;
- 
      }
      else if (incdata[0] == '0'){
       scheduler = 0;
+    
      }
   }
 
@@ -331,34 +355,42 @@ void callback(char* topic, byte* payload, unsigned int length) {
   if (strcmp(topic, "Alarm_1_OnOff") == 0){
      if (incdata[0] == '1'){
       playAlarm_1 = 1;
+   
  
      }
      else if (incdata[0] == '0'){
       playAlarm_1 = 0;
+
      }
   }
 
   if (strcmp(topic, "Alarm_2_OnOff") == 0){
      if (incdata[0] == '1'){
       playAlarm_2 = 1;
+
  
      }
      else if (incdata[0] == '0'){
       playAlarm_2 = 0;
+
      }
   }
 
   if (strcmp(topic, "Alarm_3_OnOff") == 0){
      if (incdata[0] == '1'){
       playAlarm_3 = 1;
+
  
      }
      else if (incdata[0] == '0'){
       playAlarm_3 = 0;
+
      }
   }
 
   if (strcmp(topic, "Alarm_1_Time") == 0){
+
+
 
     int timeValue = 0;
 
@@ -375,6 +407,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   if (strcmp(topic, "Alarm_2_Time") == 0){
 
+
+
     int timeValue = 0;
     for (int i = 0;i<length;i++){
         timeValue += (incdata[i]-'0')*pow(10,(length-1-i));
@@ -388,6 +422,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
 
   if (strcmp(topic, "Alarm_3_Time") == 0){
+
+
 
     int timeValue = 0;
     for (int i = 0;i<length;i++){
