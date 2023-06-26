@@ -81,12 +81,24 @@ uint8_t AlarmMenu=0;
 uint8_t HomeMenu=1;
 
 
- 
-// void IRAM_ATTR toggleAlarm()
-// {
-//   stopAlarm = 1;
-//   Serial.println("Interrupt Called");
-// }
+void IRAM_ATTR LCD_1() {
+
+  if (digitalRead(12)==0){
+    gotoAlarm = 1;
+    HomeMenu = 0;
+  }
+}
+
+
+void IRAM_ATTR LCD_2() {
+  
+  if (digitalRead(14)==0){
+      gotomainMenu = 1;
+      gotoAlarm =0;
+      AlarmMenu = 0;
+  }
+}
+
 
 void setup() {
   Serial.begin(115200);
@@ -102,10 +114,9 @@ void setup() {
   dhtSensor.setup(DHT_PIN, DHTesp::DHT22);
   lcd.init();
   lcd.backlight();
+  attachInterrupt(digitalPinToInterrupt(12), LCD_1, RISING);
+  attachInterrupt(digitalPinToInterrupt(14), LCD_2, RISING);
 
-  // pinMode(25, OUTPUT);
-  // digitalWrite(25,LOW);
-  // attachInterrupt(25, toggleAlarm, FALLING);
 }
 
 void loop() {
@@ -126,18 +137,8 @@ void loop() {
   mqttClient.publish("Tempt", tempAr);
   mqttClient.publish("Hum", humAr);
   lcd_display();
-  Serial.print("Alarm_1: ");
-  Serial.print((alarm_1_hour));
-  Serial.print(":");
-  Serial.println((alarm_1_min));
-  Serial.print("Alarm_2: ");
-  Serial.print(alarm_2_hour);
-  Serial.print(":");
-  Serial.println(alarm_2_min);
-  Serial.print("Alarm_3: ");
-  Serial.print(alarm_3_hour);
-  Serial.print(":");
-  Serial.println(alarm_3_min);
+  debugPrint();
+
 
   delay(100);
   
@@ -147,15 +148,8 @@ void lcd_display(){
 
 
 
-  if (digitalRead(12)==0){
-    gotoAlarm = 1;
-    HomeMenu = 0;
-  }
-  if (digitalRead(14)==0){
-      gotomainMenu = 1;
-      gotoAlarm =0;
-      AlarmMenu = 0;
-  }
+
+
 
 
   if (gotoAlarm==1){
@@ -233,21 +227,18 @@ void readTime(){
   day = now.day();
   hour = now.hour();
   minute = now.minute();
-  Serial.print("Time: ");
-  Serial.print(hour);
-  Serial.print(":");
-  Serial.println(minute);
+
 }
 
 void buzzerAlarms(){
 
 
     if ((scheduler == 1) && (numofDays>0)){
-      Serial.println("In scheduler");
+
       if (playAlarm_1==1){
-        Serial.println("in al 1");
+
         if (((hour-alarm_1_hour)==0) && ((minute - alarm_1_min)==0)){
-          Serial.println("in alarm_1");
+
           playingAlarm_1  = 1;
           PlayBuzzer();
           
@@ -289,7 +280,7 @@ void setupWifi(){
 
 void PlayBuzzer(){
 
-  Serial.println("alarm:");
+
   if (buzzerMode ==0){  
     // digitalWrite(13, HIGH);
     // delay(100);
@@ -390,7 +381,7 @@ void updateTempAndHum(){
   String(data.humidity, 1).toCharArray(humAr,6);
   Serial.println("Temp: " + String(data.temperature, 1) + "°C");
   Serial.println("Humidity: " + String(data.humidity, 1) + "%");
-  Serial.println("---");
+
 }
 void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message:Topic[");
@@ -579,15 +570,45 @@ void readLDR(){
   char ldr[6];
   dtostrf(LDR_Val, 4, 3, ldr);
    mqttClient.publish("UVINDEX", ldr);
-  Serial.println(LDR_Val);
+  
 
 }
 void servoTurn(){
   servoAngle = angleOffset+(180-angleOffset)*LDR_Val*CF;
-  Serial.print("Servo: ");
-  Serial.println(servoAngle);
+
   servo.write(servoAngle);
 
   
+
+}
+
+void debugPrint(){
+  Serial.print("Servo: ");
+  Serial.println(servoAngle);
+
+  Serial.print("Light Intensity: ");
+  Serial.println(LDR_Val);
+
+
+
+  Serial.print("Time: ");
+  Serial.print(hour);
+  Serial.print(":");
+  Serial.println(minute);
+
+  Serial.print("Alarm_1: ");
+  Serial.print((alarm_1_hour));
+  Serial.print(":");
+  Serial.println((alarm_1_min));
+  Serial.print("Alarm_2: ");
+  Serial.print(alarm_2_hour);
+  Serial.print(":");
+  Serial.println(alarm_2_min);
+  Serial.print("Alarm_3: ");
+  Serial.print(alarm_3_hour);
+  Serial.print(":");
+  Serial.println(alarm_3_min);
+
+
 
 }
