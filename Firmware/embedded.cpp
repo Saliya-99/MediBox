@@ -24,6 +24,9 @@ uint8_t numofDays = 0;
 uint8_t  playAlarm_1  = 0;
 uint8_t  playAlarm_2  = 0;
 uint8_t  playAlarm_3  = 0;
+uint8_t  playingAlarm_1  = 0;
+uint8_t  playingAlarm_2  = 0;
+uint8_t  playingAlarm_3  = 0;
 uint8_t  scheduler  = 0;
 uint8_t alarm_1_hour = 0;
 uint8_t alarm_1_min = 0;
@@ -60,7 +63,8 @@ const int DHT_PIN = 15;
 
 uint8_t gotoAlarm = 0;
 uint8_t gotomainMenu=0;
-
+uint8_t AlarmMenu=0;
+uint8_t HomeMenu=1;
 
 
  
@@ -131,16 +135,23 @@ void lcd_display(){
 
   if (digitalRead(12)==0){
     gotoAlarm = 1;
+    HomeMenu = 0;
   }
   if (digitalRead(14)==0){
       gotomainMenu = 1;
       gotoAlarm =0;
+      AlarmMenu = 0;
   }
-  // Serial.println(digitalRead(12));
+
 
   if (gotoAlarm==1){
 
-    lcd.clear();
+    if (AlarmMenu==0){
+      lcd.clear();
+      AlarmMenu = 1;
+    }
+
+    
 
     lcd.setCursor(0, 0);
     lcd.print("Alarm 1: ");
@@ -181,7 +192,13 @@ void lcd_display(){
   
   else{
 
-    lcd.clear();
+    if (HomeMenu==0){
+       lcd.clear();
+       HomeMenu = 1;
+
+    }
+
+   
     lcd.setCursor(7, 0);
     lcd.print("WELCOME");
     lcd.setCursor(7, 1);
@@ -217,20 +234,27 @@ void buzzerAlarms(){
         Serial.println("in al 1");
         if (((hour-alarm_1_hour)==0) && ((minute - alarm_1_min)==0)){
           Serial.println("in alarm_1");
+          playingAlarm_1  = 1;
           PlayBuzzer();
+          
+
         }
       }
 
 
       if (playAlarm_2==1){
         if ((hour == alarm_2_hour) && (minute == alarm_2_min)){
+          playingAlarm_2  = 1;
           PlayBuzzer();
+          
         }
       }
 
       if (playAlarm_3==1){
         if ((hour == alarm_3_hour) && (minute == alarm_3_min)){
+          playingAlarm_3  = 1;
           PlayBuzzer();
+          
         }
       }
   }
@@ -266,8 +290,34 @@ void PlayBuzzer(){
       
   }
   else{
-   
-    tone(13, buzzerFrequency, buzzerDelay);
+    while(1){
+        tone(13, buzzerFrequency, buzzerDelay);
+          if (!mqttClient.connected()){
+              connectToBroker();
+          }
+        mqttClient.loop();
+        if (scheduler == 0){
+          break;
+        }
+
+        if((playingAlarm_1==1) &&(playAlarm_1==0) ){
+          playingAlarm_1=0;
+          break;
+        }
+        if((playingAlarm_2==1) &&(playAlarm_2==0) ){
+          playingAlarm_2=0;
+          break;
+        }
+        if((playingAlarm_3==1) &&(playAlarm_3==0) ){
+          playingAlarm_3=0;
+          break;
+        }
+        if (buzzerMode ==0){
+          break;
+        }
+
+    }
+    
   }
 
 
