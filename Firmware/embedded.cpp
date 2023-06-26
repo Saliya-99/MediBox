@@ -17,9 +17,10 @@ WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 LiquidCrystal_I2C lcd(I2C_ADDR, LCD_COLUMNS, LCD_LINES);
 DHTesp dhtSensor;
+//////////////////////////////////////////////////////////////////////////////
 //variables
 //schedulaer
-
+////////////////////////////////////
 uint8_t numofDays = 0;
 uint8_t  playAlarm_1  = 0;
 uint8_t  playAlarm_2  = 0;
@@ -34,33 +35,46 @@ uint8_t alarm_2_hour = 0;
 uint8_t alarm_2_min = 0;
 uint8_t alarm_3_hour = 0;
 uint8_t alarm_3_min = 0;
+////////////////////////////////////
 //min and max value of temperature and humidity
+////////////////////////////////////
 uint8_t minTemp;
 uint8_t maxTemp;
 uint8_t minHum;
 uint8_t maxHum;
+////////////////////////////////////
 //Light intensity
+////////////////////////////////////
 float LDR_Val = 0;    
 int LDR_PIN =34; 
+////////////////////////////////////
 //shade controller
+////////////////////////////////////
 uint8_t servoAngle;
 uint8_t angleOffset = 30;
 float CF = 0.75;
 int pos;
+////////////////////////////////////
 //buzzer settings 
+////////////////////////////////////
 int buzzerDelay= 100;
 int buzzerFrequency= 250;
 uint8_t buzzerMode = 0;
+////////////////////////////////////
 //RTC module
+////////////////////////////////////
 uint8_t day;
 uint8_t hour;
 uint8_t minute;
+////////////////////////////////////
+//dht22 sensor
+////////////////////////////////////
 char tempAr[9];
 char humAr[6];
-//dht22 sensor
 const int DHT_PIN = 15;
+////////////////////////////////////
 //LCD display controll
-
+////////////////////////////////////
 uint8_t gotoAlarm = 0;
 uint8_t gotomainMenu=0;
 uint8_t AlarmMenu=0;
