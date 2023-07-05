@@ -146,6 +146,30 @@ void loop() {
 
 void lcd_display(){
 
+  
+    char hour_lcd[10];
+    sprintf(hour_lcd, "%02d", hour);
+
+    char minute_lcd[10];
+    sprintf(minute_lcd, "%02d", minute);
+
+    char alarm_1_hour_lcd[10];
+    sprintf(alarm_1_hour_lcd, "%02d", alarm_1_hour);
+
+    char alarm_2_hour_lcd[10];
+    sprintf(alarm_2_hour_lcd, "%02d", alarm_2_hour);
+
+    char alarm_3_hour_lcd[10];
+    sprintf(alarm_3_hour_lcd, "%02d", alarm_3_hour);
+
+    char alarm_1_min_lcd[10];
+    sprintf(alarm_1_min_lcd, "%02d", alarm_1_min);
+
+    char alarm_2_min_lcd[10];
+    sprintf(alarm_2_min_lcd, "%02d", alarm_2_min);
+
+    char alarm_3_min_lcd[10];
+    sprintf(alarm_3_min_lcd, "%02d", alarm_3_min);
 
 
 
@@ -165,36 +189,36 @@ void lcd_display(){
     lcd.print("Alarm 1: ");
 
     lcd.setCursor(10, 0);
-    lcd.print(alarm_1_hour);
+    lcd.print(alarm_1_hour_lcd);
 
     lcd.setCursor(12, 0);
     lcd.print(":");
     lcd.setCursor(13, 0);
-    lcd.print(alarm_1_min);
+    lcd.print(alarm_1_min_lcd);
 
     
     lcd.setCursor(0, 1);
     lcd.print("Alarm 2: ");
 
     lcd.setCursor(10, 1);
-    lcd.print(alarm_2_hour);
+    lcd.print(alarm_2_hour_lcd);
 
     lcd.setCursor(12, 1);
     lcd.print(":");
     lcd.setCursor(13, 1);
-    lcd.print(alarm_2_min);
+    lcd.print(alarm_2_min_lcd);
 
     
     lcd.setCursor(0, 2);
     lcd.print("Alarm 3: ");
 
     lcd.setCursor(10, 2);
-    lcd.print(alarm_3_hour);
+    lcd.print(alarm_3_hour_lcd);
 
     lcd.setCursor(12, 2);
     lcd.print(":");
     lcd.setCursor(13, 2);
-    lcd.print(alarm_3_min);
+    lcd.print(alarm_3_min_lcd);
     
   }
   
@@ -206,15 +230,14 @@ void lcd_display(){
 
     }
 
-   
     lcd.setCursor(7, 0);
     lcd.print("WELCOME");
     lcd.setCursor(7, 1);
-    lcd.print(hour);
+    lcd.print(hour_lcd);
     lcd.setCursor(9, 1);
     lcd.print(":");
     lcd.setCursor(10, 1);
-    lcd.print(minute);
+    lcd.print(minute_lcd);
 
   }
 
